@@ -1,5 +1,6 @@
 const canvas = document.getElementById('farmCanvas');
 const ctx = canvas.getContext('2d');
+const canvasWrapper = document.querySelector('.canvas-wrapper');
 
 let rooms = {};
 let links = [];
@@ -9,7 +10,11 @@ let antRegistry = {};
 let startRoomName = "";
 let endRoomName = "";
 
-// Wire up events cleanly
+// Preload the Anthill image asset for the end room node
+const anthillImage = new Image();
+anthillImage.src = '/static/anthill2.png';
+anthillImage.onload = () => { if(Object.keys(rooms).length > 0) renderStaticNetwork(); };
+
 document.getElementById('btnLoad').addEventListener('click', compileTelemetryPayload);
 document.getElementById('btnPlay').addEventListener('click', runSimulationEngine);
 
@@ -24,7 +29,7 @@ function compileTelemetryPayload() {
     startRoomName = "";
     endRoomName = "";
 
-    // Clear out any stale DOM ant items lingering from previous simulation iterations
+    // Clear any existing active ants on rebuild
     document.querySelectorAll('.gif-ant').forEach(el => el.remove());
 
     let nextIsStart = false;
@@ -36,13 +41,11 @@ function compileTelemetryPayload() {
         if (line === "##end") { nextIsEnd = true; continue; }
         if (line.startsWith('#')) continue; 
 
-        // 1. Parse Ant Moves (Lines starting with 'L')
         if (line.startsWith('L') || line.includes(' L')) {
             turns.push(line);
             continue;
         }
 
-        // 2. Parse Links/Tunnels (Contains '-')
         if (line.includes('-')) {
             const parts = line.split('-');
             if (parts.length !== 2) {
@@ -62,11 +65,9 @@ function compileTelemetryPayload() {
             continue;
         }
 
-        // 3. Parse Rooms (Space-separated: name X Y)
         const parts = line.split(/\s+/);
         if (parts.length === 3) {
             const name = parts[0].trim();
-            
             if (name.startsWith('L') || name.startsWith('#')) {
                 telemetryBox.innerText = `ERROR: Room name '${name}' is invalid (cannot start with L or #).`;
                 return;
@@ -74,7 +75,6 @@ function compileTelemetryPayload() {
 
             const x = parseInt(parts[1]);
             const y = parseInt(parts[2]);
-            
             if (isNaN(x) || isNaN(y)) {
                 telemetryBox.innerText = `ERROR: Room '${name}' has invalid non-integer coordinates.`;
                 return;
@@ -101,7 +101,7 @@ function compileTelemetryPayload() {
         telemetryBox.innerText = `Graph Loaded! ${Object.keys(rooms).length} rooms, ${links.length} tunnels, and ${turns.length} transit rounds ready to animate!`;
     } else {
         btnPlay.disabled = true;
-        telemetryBox.innerText = "ERROR: Map parsed successfully, but no tracking movement tokens (L lines) were found.";
+        telemetryBox.innerText = "ERROR: Map parsed successfully, but no tracking movement details were found.";
     }
 }
 
@@ -114,7 +114,7 @@ function scaleGraphCoordinates() {
     let minY = Math.min(...roomList.map(r => r.y));
     let maxY = Math.max(...roomList.map(r => r.y));
 
-    const margin = 70;
+    const margin = 110; 
     const xScale = (canvas.width - margin * 2) / (maxX - minX || 1);
     const yScale = (canvas.height - margin * 2) / (maxY - minY || 1);
 
@@ -127,49 +127,83 @@ function scaleGraphCoordinates() {
 function renderStaticNetwork() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw Tunnels
-    ctx.strokeStyle = '#cbd5e1'; 
-    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    
+    // Draw Earthy/Sand Brown Tunnel Tracks
+    ctx.strokeStyle = '#a16207'; 
+    ctx.lineWidth = 20;
     for (let edge of links) {
-        const node1 = rooms[edge.from];
-        const node2 = rooms[edge.to];
-        if (node1 && node2) {
-            ctx.beginPath();
-            ctx.moveTo(node1.screenX, node1.screenY);
-            ctx.lineTo(node2.screenX, node2.screenY);
-            ctx.stroke();
-        }
+        const n1 = rooms[edge.from]; const n2 = rooms[edge.to];
+        if (n1 && n2) { ctx.beginPath(); ctx.moveTo(n1.screenX, n1.screenY); ctx.lineTo(n2.screenX, n2.screenY); ctx.stroke(); }
     }
 
-    // Draw Rooms
+    ctx.strokeStyle = '#d97706'; 
+    ctx.lineWidth = 14;
+    for (let edge of links) {
+        const n1 = rooms[edge.from]; const n2 = rooms[edge.to];
+        if (n1 && n2) { ctx.beginPath(); ctx.moveTo(n1.screenX, n1.screenY); ctx.lineTo(n2.screenX, n2.screenY); ctx.stroke(); }
+    }
+
+    // Draw Enlarged Ant Chambers (Upgraded to 34px radius)
     for (let key in rooms) {
         const room = rooms[key];
-        if (key === startRoomName) { ctx.fillStyle = '#dcfce7'; ctx.strokeStyle = '#16a34a'; } 
-        else if (key === endRoomName) { ctx.fillStyle = '#fee2e2'; ctx.strokeStyle = '#dc2626'; } 
-        else { ctx.fillStyle = '#f8fafc'; ctx.strokeStyle = '#0284c7'; }
+        
+        ctx.save();
+        ctx.shadowColor = 'rgba(67, 43, 15, 0.4)';
+        ctx.shadowBlur = 8;
 
-        ctx.lineWidth = 2;
+        if (key === startRoomName) { ctx.fillStyle = '#b45309'; ctx.strokeStyle = '#78350f'; } 
+        else if (key === endRoomName) { ctx.fillStyle = '#7c2d12'; ctx.strokeStyle = '#451a03'; } 
+        else { ctx.fillStyle = '#ca8a04'; ctx.strokeStyle = '#854d0e'; }
+
+        ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.arc(room.screenX, room.screenY, 18, 0, Math.PI * 2);
+        ctx.arc(room.screenX, room.screenY, 34, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
+        ctx.restore();
 
-        ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 12px sans-serif';
+        // Slice and present the custom Anthill artwork cleanly within the bounds of the destination room hole
+        if (key === endRoomName) {
+            ctx.save();
+            ctx.beginPath();
+            // 1. INCREASE RADIUS HERE (e.g., changed from 34 to 50)
+            ctx.arc(room.screenX, room.screenY, 70, 0, Math.PI * 2);
+            ctx.clip();
+            if (anthillImage.complete) {
+                // 2. INCREASE IMAGE DRAW SIZE TO MATCH (e.g., changed from 100x100 to 140x140)
+                // Formula: offset should be -size/2, and dimensions should be size to center it perfectly.
+                ctx.drawImage(anthillImage, room.screenX - 70, room.screenY - 70, 140, 140);
+            }
+            ctx.restore();
+            
+            ctx.strokeStyle = '#451a03';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            // 3. INCREASE OUTER RING RADIUS TO MATCH THE NEW CLIP RADIUS (changed from 34 to 50)
+            ctx.arc(room.screenX, room.screenY, 70, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        ctx.fillStyle = '#fef08a';
+        ctx.font = 'bold 16px monospace';
         ctx.textAlign = 'center';
-        ctx.fillText(room.name, room.screenX, room.screenY - 24);
+        ctx.textBaseline = 'middle';
+        ctx.fillText(room.name, room.screenX, room.screenY);
     }
 }
 
 async function runSimulationEngine() {
     document.getElementById('btnPlay').disabled = true;
     antRegistry = {}; 
+    document.querySelectorAll('.gif-ant').forEach(el => el.remove());
 
     const startNode = rooms[startRoomName];
     const telemetryBox = document.getElementById('statusTelemetry');
 
     for (let idx = 0; idx < turns.length; idx++) {
-        telemetryBox.innerText = `Processing Round: ${idx + 1} / ${turns.length}`;
+        telemetryBox.innerText = `Colony Moving: Step ${idx + 1} / ${turns.length}`;
         
         const actions = turns[idx].split(/\s+/).filter(a => a.startsWith('L'));
         let stepAnimations = [];
@@ -181,10 +215,7 @@ async function runSimulationEngine() {
             const targetNodeName = details[1];
             const targetNode = rooms[targetNodeName];
 
-            if (!targetNode) {
-                telemetryBox.innerText = `Simulation Error: Ant A${antId} moved to an unknown room '${targetNodeName}'.`;
-                return;
-            }
+            if (!targetNode) return;
 
             if (targetNodeName !== startRoomName && targetNodeName !== endRoomName) {
                 if (roomsOccupiedThisTurn[targetNodeName]) {
@@ -215,18 +246,17 @@ async function runSimulationEngine() {
         if (stepAnimations.length > 0) {
             await executeFrameLerp(stepAnimations);
         }
-        await new Promise(resolve => setTimeout(resolve, 400));
+        await new Promise(resolve => setTimeout(resolve, 200));
     }
 
-    telemetryBox.innerText = "Simulation complete! All ants arrived cleanly without violating farm rules.";
+    telemetryBox.innerText = "Simulation complete! All ants arrived safely inside the anthill.";
     document.getElementById('btnPlay').disabled = false;
 }
 
 function executeFrameLerp(animations) {
     return new Promise((resolve) => {
         let currentFrame = 0;
-        const totalFrames = 120; 
-        const displayPanel = document.querySelector('.display-panel');
+        const totalFrames = 80; 
 
         function process() {
             currentFrame++;
@@ -243,8 +273,6 @@ function executeFrameLerp(animations) {
                 const dx = item.toX - item.fromX;
                 const dy = item.toY - item.fromY;
                 let angle = Math.atan2(dy, dx);
-
-                // 1. Keep the forward rotation direction pointer
                 angle += Math.PI; 
 
                 let antEl = document.getElementById(`dom-ant-${item.id}`);
@@ -253,18 +281,20 @@ function executeFrameLerp(animations) {
                     antEl.id = `dom-ant-${item.id}`;
                     antEl.className = 'gif-ant';
                     antEl.innerHTML = `
-                        <img src="/static/ant.gif" style="width:100%; height:100%;" />
+                        <img src="/static/ant.gif" />
                         <span class="gif-ant-id">A${item.id}</span>
                     `;
-                    displayPanel.appendChild(antEl);
+                    canvasWrapper.appendChild(antEl);
                 }
 
-                const canvasLeft = canvas.offsetLeft;
-                const canvasTop = canvas.offsetTop;
-                antEl.style.left = `${canvasLeft + liveX - 24}px`;
-                antEl.style.top = `${canvasTop + liveY - 24}px`;
-                
-                // 2. CRITICAL FIX: Add scaleY(-1) to flip the legs vertically back to their right alignment!
+                // MATHEMATICAL RESPONSIVE COUPLING
+                // Translate internal canvas pixels directly into absolute layout percentages
+                const percentageX = (liveX / canvas.width) * 100;
+                const percentageY = (liveY / canvas.height) * 100;
+
+                // Center position the 48x48px moving element cleanly via CSS vectors
+                antEl.style.left = `calc(${percentageX}% - 24px)`;
+                antEl.style.top = `calc(${percentageY}% - 24px)`;
                 antEl.style.transform = `rotate(${angle}rad) scaleY(-1)`;
             }
 

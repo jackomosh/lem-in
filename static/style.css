@@ -1,42 +1,40 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #f8fafc; /* Crisp, clean light background */
-    color: #0f172a;            /* Dark graphite text */
+    background-color: #fcfaf7;
+    color: #0f172a;            
     font-family: system-ui, -apple-system, sans-serif;
 }
 
 .app-container {
-    max-width: 1400px;
+    max-width: 1500px;
     margin: 0 auto;
     padding: 16px;
     box-sizing: border-box;
 }
 
-/* Centered Header with significant top margin */
 .brand-header {
     text-align: center;
-    margin-top: 50px;       /* Generous top margin spacing */
+    margin-top: 50px;       
     margin-bottom: 30px;
 }
 
 .brand-header h1 {
     margin: 0 0 8px 0;
-    color: #0284c7;         /* Deep readable sky blue */
+    color: #854d0e;         
     font-size: 2.2rem;
     font-weight: 800;
 }
 
 .brand-header p {
     margin: 0;
-    color: #475569;         /* Soft dark grey descriptive text */
+    color: #475569;         
     font-size: 1.05rem;
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.5;
 }
 
-/* Fluid Flex-Grid layout context */
 .main-layout {
     display: flex;
     flex-direction: column;
@@ -54,10 +52,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    background: #ffffff;    /* Clean white element card container */
+    background: #ffffff;    
     padding: 24px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     border: 1px solid #e2e8f0;
     box-sizing: border-box;
     min-width: 320px;
@@ -66,7 +64,7 @@ body {
 textarea {
     width: 100%;
     height: 250px;
-    background: #f1f5f9;    /* Slightly muted grey inner canvas */
+    background: #f8fafc;    
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     color: #0f172a;
@@ -79,7 +77,7 @@ textarea {
 
 @media (min-width: 1024px) {
     textarea {
-        height: 380px;
+        height: 480px;
     }
 }
 
@@ -105,21 +103,21 @@ textarea {
     transform: scale(0.98);
 }
 
-.btn.primary { background: #0284c7; color: white; }
-.btn.primary:hover { background: #0369a1; }
+.btn.primary { background: #a16207; color: white; }
+.btn.primary:hover { background: #854d0e; }
 .btn.success { background: #16a34a; color: white; }
 .btn.success:hover { background: #15803d; }
-.btn:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.6; }
+.btn:disabled { background: #cbd5e1; cursor: not-allowed; opacity: 0.6; color: #94a3b8; }
 
 .status-box {
-    background: #f8fafc;
-    color: #334155;
+    background: #fef08a;
+    color: #713f12;
     padding: 12px;
     border-radius: 6px;
     font-size: 0.9rem;
     line-height: 1.4;
-    border: 1px solid #e2e8f0;
-    border-left: 4px solid #0284c7;
+    border: 1px solid #fef08a;
+    border-left: 4px solid #a16207;
 }
 
 .display-panel {
@@ -135,42 +133,49 @@ textarea {
     padding: 16px;
 }
 
+.canvas-wrapper {
+    width: 100%;
+    position: relative;
+    display: inline-block;
+}
+
 canvas {
-    max-width: 100%;
-    height: auto !important;
-    background: #f1f5f9;    /* Clean light workspace background for the grid */
+    display: block;
+    width: 100%;
+    height: auto;
+    background-color: #f3eae1; 
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    box-shadow: inset 0 0 20px rgba(113, 63, 18, 0.15);
 }
 
-/* Container must allow absolute positioning inside it */
-.display-panel {
-    position: relative; 
-}
-
-/* Dynamic GIF Ant layer */
-
+/* --- RESPONSIVE DOM ANT ELEMENT LAYER --- */
 .gif-ant {
     position: absolute;
-    width: 48px;  /* Increased size */
-    height: 48px; /* Increased size */
+    width: 48px;  
+    height: 48px; 
     pointer-events: none;
     z-index: 10;
     transform-origin: center center;
-    transition: transform 0.05s linear;
+    /* CSS cross-browser matrix filters turning gray textures into active fire-ant red */
+    /* filter: invert(22%) sepia(80%) saturate(6500%) hue-rotate(350deg) brightness(88%) contrast(110%); */
 }
 
-/* Badge ID attached above the GIF */
+.gif-ant img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
 .gif-ant-id {
     position: absolute;
-    top: -18px;
+    top: -16px;
     left: 50%;
     transform: translateX(-50%);
-    background: #0284c7;
-    color: white;
-    font-size: 10px;
+    background: #451a03;
+    color: #fef08a;
+    font-size: 11px;
     font-weight: bold;
-    padding: 2px 5px;
-    border-radius: 4px;
+    padding: 1px 4px;
+    border-radius: 3px;
     white-space: nowrap;
 }

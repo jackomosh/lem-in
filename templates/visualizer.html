@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐜 Lem-in Active Spatial Engine</title>
+    <title>🐜 Lem-in Real-World Ant Farm </title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="app-container">
         <header class="brand-header">
-            <h1>🐜 Lem-in Active Spatial Monitor</h1>
-            <p>Paste your full terminal logging trace below to map out and animate colony pathing mechanics.</p>
+            <h1>🐜 Lem-in Real World Ant Farm Visualizer</h1>
+            <p>Paste your full terminal logging trace below to map out and animate the ants colony paths.</p>
         </header>
 
         <div class="main-layout">
@@ -18,13 +18,15 @@
                 <textarea id="outputLog" placeholder="Paste the entire output of 'go run . example.txt' here..."></textarea>
                 <div class="actions">
                     <button id="btnLoad" class="btn primary">Compile Farm Graph</button>
-                    <button id="btnPlay" class="btn success" disabled>Animate Colony Transit</button>
+                    <button id="btnPlay" class="btn success" disabled>Animate Colony Transitions</button>
                 </div>
-                <div id="statusTelemetry" class="status-box">Status: Awaiting input matrix data payload...</div>
+                <div id="statusTelemetry" class="status-box">Status: Awaiting input data...</div>
             </div>
 
-            <div class="display-panel">
-                <canvas id="farmCanvas" width="800" height="600"></canvas>
+            <div class="display-panel" id="displayPanel">
+                <div class="canvas-wrapper">
+                    <canvas id="farmCanvas" width="1000" height="750"></canvas>
+                </div>
             </div>
         </div>
     </div>
