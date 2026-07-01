@@ -1,9 +1,12 @@
-package main
+package simulator
 
-import "testing"
+import (
+	"testing"
+	"lem-in/shared"
+)
 
 func TestTrafficDispatcherNoCrash(t *testing.T) {
-	g := NewGraph()
+	g := shared.NewGraph()
 	g.Start = "Start"
 	g.End = "End"
 	g.AntCount = 2

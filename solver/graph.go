@@ -1,35 +1,16 @@
-package main
+package solver
 
-// Room represents a node inside the ant farm matrix.
-type Room struct {
-	Name string
-	X, Y int
-}
-
-// Graph maps out structural elements and adjacent link paths.
-type Graph struct {
-	Rooms    map[string]*Room
-	AdjList  map[string][]string
-	Start    string
-	End      string
-	AntCount int
-}
-
-func NewGraph() *Graph {
-	return &Graph{
-		Rooms:   make(map[string]*Room),
-		AdjList: make(map[string][]string),
-	}
-}
+import "lem-in/shared"
 
 // FindNodeDisjointPaths extracts multiple valid paths that don't share intermediate nodes or edges.
-func (g *Graph) FindNodeDisjointPaths() [][]string {
+// We change this from a method receiver to a standard function accepting *shared.Graph.
+func FindNodeDisjointPaths(g *shared.Graph) [][]string {
 	var paths [][]string
 	usedRooms := make(map[string]bool)
 	usedFirstSteps := make(map[string]bool) // Tracks first steps to prevent infinite loop on direct paths
 
 	for {
-		path := g.bfsShortestPath(usedRooms, usedFirstSteps)
+		path := bfsShortestPath(g, usedRooms, usedFirstSteps)
 		if len(path) == 0 {
 			break
 		}
@@ -50,7 +31,7 @@ func (g *Graph) FindNodeDisjointPaths() [][]string {
 	return paths
 }
 
-func (g *Graph) bfsShortestPath(usedRooms map[string]bool, usedFirstSteps map[string]bool) []string {
+func bfsShortestPath(g *shared.Graph, usedRooms map[string]bool, usedFirstSteps map[string]bool) []string {
 	queue := [][]string{{g.Start}}
 	visited := map[string]bool{g.Start: true}
 

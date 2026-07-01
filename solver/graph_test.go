@@ -1,17 +1,20 @@
-package main
+package solver
 
-import "testing"
+import (
+	"testing"
+	"lem-in/shared"
+)
 
 func TestDisjointPathExtraction(t *testing.T) {
-	g := NewGraph()
+	g := shared.NewGraph()
 	g.Start = "A"
 	g.End = "D"
 	g.AntCount = 4
 
-	g.Rooms["A"] = &Room{Name: "A"}
-	g.Rooms["B"] = &Room{Name: "B"}
-	g.Rooms["C"] = &Room{Name: "C"}
-	g.Rooms["D"] = &Room{Name: "D"}
+	g.Rooms["A"] = &shared.Room{Name: "A"}
+	g.Rooms["B"] = &shared.Room{Name: "B"}
+	g.Rooms["C"] = &shared.Room{Name: "C"}
+	g.Rooms["D"] = &shared.Room{Name: "D"}
 
 	// Path 1: A -> B -> D
 	g.AdjList["A"] = append(g.AdjList["A"], "B")
@@ -23,7 +26,7 @@ func TestDisjointPathExtraction(t *testing.T) {
 	g.AdjList["C"] = append(g.AdjList["C"], "A", "D")
 	g.AdjList["D"] = append(g.AdjList["D"], "C")
 
-	paths := g.FindNodeDisjointPaths()
+	paths := FindNodeDisjointPaths(g)
 	if len(paths) != 2 {
 		t.Errorf("Expected 2 distinct node-disjoint paths, extracted %d instead", len(paths))
 	}

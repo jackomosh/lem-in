@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	"testing"
+	"lem-in/parser"
+	"lem-in/solver"
 )
 
 func TestAuditComprehensiveSuite(t *testing.T) {
@@ -55,13 +57,13 @@ start-end`,
 			}
 			defer os.Remove(tmpFile)
 
-			g, _, err := ParseInput(tmpFile)
+			g, _, err := parser.ParseInput(tmpFile)
 			if (err != nil) != tt.expectError {
 				t.Errorf("Test Case '%s' failed. Expected error presence: %v, got: %v", tt.name, tt.expectError, err)
 			}
 
 			if err == nil {
-				paths := g.FindNodeDisjointPaths()
+				paths := solver.FindNodeDisjointPaths(g)
 				if len(paths) == 0 {
 					t.Errorf("Valid graph topology failed path matrix generation checks")
 				}

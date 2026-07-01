@@ -1,18 +1,13 @@
-package main
+package simulator
 
 import (
 	"fmt"
 	"strings"
+	"lem-in/shared"
 )
 
-type AntState struct {
-	ID       int
-	Path     []string
-	Position int
-}
-
 // CoordinateAntTraffic distributes ants optimally across the paths and outputs their steps.
-func CoordinateAntTraffic(g *Graph, paths [][]string) {
+func CoordinateAntTraffic(g *shared.Graph, paths [][]string) {
 	if len(paths) == 0 {
 		fmt.Println("ERROR: invalid data format, no path discovered between start and end vertices")
 		return
@@ -35,12 +30,12 @@ func CoordinateAntTraffic(g *Graph, paths [][]string) {
 	}
 
 	// 2. Queue up operations across the execution matrix
-	activeAnts := make([]*AntState, 0)
+	activeAnts := make([]*shared.AntState, 0)
 	antCounter := 1
 
 	for pathIdx, totalAntsForPath := range pathDistribution {
 		for i := 0; i < totalAntsForPath; i++ {
-			activeAnts = append(activeAnts, &AntState{
+			activeAnts = append(activeAnts, &shared.AntState{
 				ID:       antCounter,
 				Path:     paths[pathIdx],
 				Position: 0,
@@ -50,7 +45,7 @@ func CoordinateAntTraffic(g *Graph, paths [][]string) {
 	}
 
 	// 3. Execution loop simulation step tracker
-	antsInMotion := make([]*AntState, 0)
+	antsInMotion := make([]*shared.AntState, 0)
 	deployedIndex := 0
 
 	for deployedIndex < len(activeAnts) || len(antsInMotion) > 0 {
@@ -59,7 +54,7 @@ func CoordinateAntTraffic(g *Graph, paths [][]string) {
 		
 		// Move active ants forward
 		var outputTokens []string
-		var nextInMotion []*AntState
+		var nextInMotion []*shared.AntState
 
 		for _, ant := range antsInMotion {
 			ant.Position++
@@ -98,4 +93,3 @@ func CoordinateAntTraffic(g *Graph, paths [][]string) {
 		}
 	}
 }
-

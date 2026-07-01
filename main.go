@@ -6,6 +6,9 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"lem-in/parser"
+	"lem-in/simulator"
+	"lem-in/solver"
 )
 
 //go:embed templates/* static/*
@@ -31,7 +34,7 @@ func main() {
 	}
 
 	// Normal CLI execution path continues as usual
-	g, rawInputLines, err := ParseInput(os.Args[1])
+	g, rawInputLines, err := parser.ParseInput(os.Args[1])
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -42,6 +45,6 @@ func main() {
 	}
 	fmt.Println()
 
-	paths := g.FindNodeDisjointPaths()
-	CoordinateAntTraffic(g, paths)
+	paths := solver.FindNodeDisjointPaths(g)
+	simulator.CoordinateAntTraffic(g, paths)
 }

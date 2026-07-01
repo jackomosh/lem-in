@@ -1,4 +1,4 @@
-package main
+package parser
 
 import (
 	"bufio"
@@ -6,17 +6,18 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"lem-in/shared"
 )
 
 // ParseInput reads an ant farm file, validates its constraints, and constructs the graph registry.
-func ParseInput(filePath string) (*Graph, []string, error) {
+func ParseInput(filePath string) (*shared.Graph, []string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, nil, err
 	}
 	defer file.Close()
 
-	g := NewGraph()
+	g := shared.NewGraph()
 	var rawLines []string
 	scanner := bufio.NewScanner(file)
 	
@@ -84,7 +85,7 @@ func ParseInput(filePath string) (*Graph, []string, error) {
 				return nil, nil, fmt.Errorf("ERROR: invalid data format, duplicate room names mapped")
 			}
 
-			g.Rooms[name] = &Room{Name: name, X: x, Y: y}
+			g.Rooms[name] = &shared.Room{Name: name, X: x, Y: y}
 			coordMap[coordKey] = true
 
 			if isStart {
