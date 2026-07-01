@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐜 Lem-in Active Spatial Engine</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="brand-header">
+            <h1>🐜 Lem-in Active Spatial Monitor</h1>
+            <p>Paste your full terminal logging trace below to map out and animate colony pathing mechanics.</p>
+        </header>
+
+        <div class="main-layout">
+            <div class="control-panel">
+                <textarea id="outputLog" placeholder="Paste the entire output of 'go run . example.txt' here..."></textarea>
+                <div class="actions">
+                    <button id="btnLoad" class="btn primary">Compile Farm Graph</button>
+                    <button id="btnPlay" class="btn success" disabled>Animate Colony Transit</button>
+                </div>
+                <div id="statusTelemetry" class="status-box">Status: Awaiting input matrix data payload...</div>
+            </div>
+
+            <div class="display-panel">
+                <canvas id="farmCanvas" width="800" height="600"></canvas>
+            </div>
+        </div>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>

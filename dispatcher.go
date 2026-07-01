@@ -98,3 +98,4 @@ func CoordinateAntTraffic(g *Graph, paths [][]string) {
 		}
 	}
 }
+
